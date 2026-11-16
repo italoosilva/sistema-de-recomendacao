@@ -1,4 +1,4 @@
-#ifndef  SIMILARIDADE_H
+#ifndef SIMILARIDADE_H
 #define SIMILARIDADE_H
 
 #include <vector>
