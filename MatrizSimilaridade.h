@@ -12,7 +12,11 @@ typedef struct {
 
 int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *ListaCompras);
 
-
-
 int ClienteSimilar(MatrizSimilaridade *matriz, int cliente);
+
+double SimilaridadeClientes(MatrizSimilaridade *matriz, int cliente1, int cliente2);
+
+
+
+
 #endif
