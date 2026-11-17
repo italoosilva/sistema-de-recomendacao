@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <vector>
 #include <list>
 #include <algorithm>
@@ -13,7 +12,7 @@ bool ordenarPorNota(const Produto &a, const Produto &b) {
 }
 
 vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int cliente, int k) {
-    if (0 > cliente || cliente >= dados->clientes.size()) {
+    if (0 > cliente || cliente >= (int)dados->clientes.size()) {
         vector<Produto> v;
         return v;
     }
@@ -39,8 +38,7 @@ vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int 
         }
     }
 
-
-    for (int j = 0; j < notas.size(); j++) {
+    for (int j = 0; j < (int)notas.size(); j++) {
         if (notas[j] < 1) {
             produtos.push_back({j, notas[j]});
         }
@@ -48,7 +46,7 @@ vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int 
 
     sort(produtos.begin(), produtos.end(), ordenarPorNota);
 
-    if (produtos.size() > k) {
+    if ((int)produtos.size() > k) {
         produtos.resize(k);
     }
     
