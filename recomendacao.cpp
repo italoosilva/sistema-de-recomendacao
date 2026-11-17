@@ -46,8 +46,8 @@ vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int 
 
     sort(produtos.begin(), produtos.end(), ordenarPorNota);
 
-    if ((int)produtos.size() > k) {
-        produtos.resize(k);
+    while ((int)produtos.size() > k) {
+    produtos.pop_back();
     }
     
     return produtos;
