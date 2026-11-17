@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include <algorithm>
 #include "ListaCompras.h"
 using namespace std;
@@ -49,9 +50,9 @@ int organizarDados(char *caminho, Lista *dados) {
 
 int gerarLista(Lista *dados, char *codCliente) {
     if (dados->indices_clientes.find(codCliente) == dados->indices_clientes.end()) {
+        printf("\nCliente %s nao encontrado. \n", codCliente);
         return -1;
     }
-    int ind_cliente = dados->indices_clientes[codCliente];
     
-    return ind_cliente;
+    return dados->indices_clientes[codCliente];;
 }
