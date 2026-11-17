@@ -9,6 +9,7 @@ typedef struct {
     double nota;
 } Produto;
 
+bool ordenarPorNota(const Produto &a, const Produto &b);
 std::vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int cliente, int k);
 
 #endif
