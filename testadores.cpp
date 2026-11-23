@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ListaCompras.h"
 #include "MatrizSimilaridade.h"
+#include <ctime>
 #include "recomendacao.h"
 using namespace std;
 
@@ -26,7 +27,7 @@ void teste1(Lista *dados) {
 
 void teste2(Lista *dados) {
     MatrizSimilaridade matriz;
-    if (CalcularSimilaridade(&matriz, dados) == 0) {
+    if (CalcularSimilaridade(&matriz, dados, 0) == 0) {
         printf("Erro ao calcular a similaridade.\n");
         return;
     
@@ -55,9 +56,10 @@ void teste2(Lista *dados) {
     return;
 }
 
+
 void teste3(Lista *dados) {
     MatrizSimilaridade matriz;
-    if (CalcularSimilaridade(&matriz, dados) == 0) {
+    if (CalcularSimilaridade(&matriz, dados, 0) == 0) {
         printf("Erro ao calcular a similaridade.\n");
         return;
     }
@@ -85,28 +87,79 @@ void teste3(Lista *dados) {
     }
     free(matriz.Similaridade);
 }
+int Primeiros(Lista *dados, Lista *sub, int k) {
+    for (int i = 0; i < k; i++) {
+        sub->clientes.push_back(dados->clientes[i]);
+        sub->comprasCliente.push_back(dados->comprasCliente[i]);
+    }
+    sub->produtos = dados->produtos;
+    return 1;
+}
+void teste4(Lista *dados) {
+    int tamanhos[4] = {100, 200, 400, 800};
+    int total = dados->clientes.size();
+
+    printf("\n%10s %14s %14s\n", "clientes", "padrao (s)", "adaptado (s)");
+    for (int t = 0; t < 4; t++) {
+        int k = tamanhos[t];
+        if (k > total) {
+            k = total;
+        }
+
+        Lista sub;
+        Primeiros(dados, &sub, k);
+        MatrizSimilaridade m0;
+        MatrizSimilaridade m1;
+
+        clock_t inicio = clock();
+        int ok0 = CalcularSimilaridade(&m0, &sub, 0);
+        double tempo0 = double(clock() - inicio) / CLOCKS_PER_SEC;
+
+        inicio = clock();
+        int ok1 = CalcularSimilaridade(&m1, &sub, 1);
+        double tempo1 = double(clock() - inicio) / CLOCKS_PER_SEC;
+
+        if (ok0 == 0 || ok1 == 0) {
+            printf("Erro ao calcular a similaridade.\n");
+            return;
+        }
+
+        int diferentes = 0;
+        for (int i = 0; i < k * k; i++) {
+            if (m0.Similaridade[i] != m1.Similaridade[i]) {
+                diferentes++;
+            }
+        }
+        printf("%10d %14.4f %14.4f   (celulas diferentes: %d)\n", k, tempo0, tempo1, diferentes);
+
+        free(m0.Similaridade);
+        free(m1.Similaridade);
+        if (k == total) {
+            break;
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
-        printf("Uso: %s <arquivo.csv> <número do testador (1-3)> \n", argv[0]);
+        printf("Uso: %s <arquivo.csv> <número do testador (1-4)> \n", argv[0]);
         return 1;
     }
 
     Lista dados;
     organizarDados(argv[1], &dados);
     int opcao = atoi(argv[2]);
-
-    if ( opcao == 1) {
+        if (opcao == 1) {
         teste1(&dados);
     } else if (opcao == 2) {
         teste2(&dados);
-    } else if (opcao == 3) {
+
+        } else if (opcao == 3) {
         teste3(&dados);
-    }else { 
-        printf("Erro: p número deve estar entre 1-3");
+    } else if (opcao == 4) {
+        teste4(&dados);
+    } else {
+        printf("Erro: o número deve estar entre 1-4\n");
         return 1;
     }
-
-    return 0;
 }
-

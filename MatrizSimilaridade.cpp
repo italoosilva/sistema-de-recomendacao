@@ -4,17 +4,20 @@
 
 using namespace std;
 
-int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *listaCompras) {
+int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *listaCompras, int algoritmo) {
     int numClientes = listaCompras->clientes.size();
     int numProdutos = listaCompras-> produtos.size();
 
     int *A = (int*) malloc (numClientes *numProdutos*sizeof(int));
-    int *B = (int*) malloc (numProdutos *numClientes*sizeof(int));
+    int *B = NULL;
+    if (algoritmo ==0){
+        B = (int*) malloc (numProdutos *numClientes*sizeof(int));
+    }
     int *C = (int*) malloc (numClientes *numClientes*sizeof(int));
     matriz->numClientes = numClientes;
     matriz->Similaridade = (double*) malloc (numClientes * numClientes * sizeof(double));
 
-if (A == NULL || B == NULL || C == NULL|| matriz->Similaridade == NULL) {
+if (A == NULL || (algoritmo == 0 && B == NULL) || C == NULL|| matriz->Similaridade == NULL) {
     perror("Error");
     return 0;
   
@@ -26,9 +29,11 @@ for (int i = 0; i < numClientes; i++) {
         A[i * numProdutos + j] = 0;
     }
 }
-for (int i = 0; i < numProdutos; i++) {
-    for (int j = 0; j < numClientes; j++) {
-        B[i * numClientes + j] = 0;
+if (algoritmo == 0) {
+    for (int i = 0; i < numProdutos; i++) {
+        for (int j = 0; j < numClientes; j++) {
+            B[i * numClientes + j] = 0;
+        }
     }
 }
 for (int i = 0; i < numClientes; i++) {
@@ -36,18 +41,31 @@ for (int i = 0; i < numClientes; i++) {
         A[i * numProdutos + p] = 1;
     }
 }
-for (int i = 0; i < numClientes; i++) {
-    for (int j = 0; j < numProdutos; j++) {
-        B[j * numClientes + i] = A[i * numProdutos + j];
-    }
-}
-for (int i = 0; i < numClientes; i++) {
-    for (int j = 0; j < numClientes; j++) {
-        C[i * numClientes + j] = 0;
-        for (int k = 0; k < numProdutos; k++) {
-            C[i * numClientes + j] += A[i * numProdutos + k] * B[k * numClientes + j];
+if (algoritmo == 0) {
+    for (int i = 0; i < numClientes; i++) {
+        for (int j = 0; j < numProdutos; j++) {
+            B[j * numClientes + i] = A[i * numProdutos + j];
         }
-}
+    }
+    for (int i = 0; i < numClientes; i++) {
+        for (int j = 0; j < numClientes; j++) {
+            C[i * numClientes + j] = 0;
+            for (int k = 0; k < numProdutos; k++) {
+                C[i * numClientes + j] += A[i * numProdutos + k] * B[k * numClientes + j];
+            }
+        }
+    }
+} else {
+    for (int i = 0; i < numClientes; i++) {
+        for (int j = i; j < numClientes; j++) {
+            int soma = 0;
+            for (int k = 0; k < numProdutos; k++) {
+                soma += A[i * numProdutos + k] * A[j * numProdutos + k];
+            }
+            C[i * numClientes + j] = soma;
+            C[j * numClientes + i] = soma;
+        }
+    }
 }
 for (int i = 0; i < numClientes; i++) {
     for (int j = 0; j < numClientes; j++) {

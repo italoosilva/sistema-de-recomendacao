@@ -10,7 +10,7 @@ typedef struct {
     double *Similaridade;
 } MatrizSimilaridade;
 
-int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *ListaCompras);
+int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *ListaCompras, int algoritimo);
 
 int ClienteSimilar(MatrizSimilaridade *matriz, int cliente);
 
