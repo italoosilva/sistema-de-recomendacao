@@ -101,40 +101,37 @@ void teste4(Lista *dados) {
 
     printf("\n%10s %14s %14s\n", "clientes", "padrao (s)", "adaptado (s)");
     for (int t = 0; t < 4; t++) {
-        int k = tamanhos[t];
-        if (k > total) {
-            k = total;
+        int n = tamanhos[t];
+        if (n > total) {
+            n = total;
         }
 
         Lista sub;
-        Primeiros(dados, &sub, k);
-        MatrizSimilaridade m0;
-        MatrizSimilaridade m1;
+        Primeiros(dados, &sub, n);
+        MatrizSimilaridade matrizPadrao;
+        MatrizSimilaridade matrizAdaptada;
 
         clock_t inicio = clock();
-        int ok0 = CalcularSimilaridade(&m0, &sub, 0);
-        double tempo0 = double(clock() - inicio) / CLOCKS_PER_SEC;
+        CalcularSimilaridade(&matrizPadrao, &sub, 0);
+        clock_t fim = clock();
+        double tempoPadrao = double(fim - inicio) / CLOCKS_PER_SEC;
 
         inicio = clock();
-        int ok1 = CalcularSimilaridade(&m1, &sub, 1);
-        double tempo1 = double(clock() - inicio) / CLOCKS_PER_SEC;
-
-        if (ok0 == 0 || ok1 == 0) {
-            printf("Erro ao calcular a similaridade.\n");
-            return;
-        }
+        CalcularSimilaridade(&matrizAdaptada, &sub, 1);
+        fim = clock();
+        double tempoAdaptado = double(fim - inicio) / CLOCKS_PER_SEC;
 
         int diferentes = 0;
-        for (int i = 0; i < k * k; i++) {
-            if (m0.Similaridade[i] != m1.Similaridade[i]) {
+        for (int i = 0; i < n * n; i++) {
+            if (matrizPadrao.Similaridade[i] != matrizAdaptada.Similaridade[i]) {
                 diferentes++;
             }
         }
-        printf("%10d %14.4f %14.4f   (celulas diferentes: %d)\n", k, tempo0, tempo1, diferentes);
+        printf("%10d %14.4f %14.4f   (celulas diferentes: %d)\n", n, tempoPadrao, tempoAdaptado, diferentes);
 
-        free(m0.Similaridade);
-        free(m1.Similaridade);
-        if (k == total) {
+        free(matrizPadrao.Similaridade);
+        free(matrizAdaptada.Similaridade);
+        if (n == total) {
             break;
         }
     }
