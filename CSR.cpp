@@ -8,7 +8,7 @@ void criaComprasCSR(Lista *dados, matrizCSR *A) {
     int cont = 0;
     A->row_ptr.push_back(cont);
 
-    for (int i; i < dados->clientes.size(); i++) {
+    for (int i=0; i < dados->clientes.size(); i++) {
         vector<int> comprasClieteOrdenada;
 
         for (int x : dados->comprasCliente[i]) {
@@ -67,5 +67,28 @@ void criaInterseccaoCSR(matrizCSR *A, matrizCSR *C) {
     return;
 }
 
-void criaSimilaridadeCSR()
+void criaSimilaridadeCSR(matrizCSR *A, matrizCSR *C, matrizCSR *S) {
+    S->row_ptr.push_back(0);
+    int num_clientes = C->row_ptr.size() - 1;
+    int cont = 0;
+
+    for (int i=0; i < num_clientes; i++) {
+        int totalCompras = A->row_ptr[i + 1] - A->row_ptr[i];
+
+        for (int j = C->row_ptr[i]; j<C->row_ptr[i+1]; j++) {
+            int vizinho = C->col_index[j];
+
+            if (vizinho == i) {
+                continue;
+            }
+            
+            double similaridade = 1.0 - (double)C->values[j] / totalCompras;
+            S->values.push_back(similaridade);
+            S->col_index.push_back(vizinho);
+            cont++;
+        }
+        S->row_ptr.push_back(cont);
+
+    }
+}
 
