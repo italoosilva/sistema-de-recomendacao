@@ -3,6 +3,7 @@
 
 #include "ListaCompras.h"
 #include "MatrizSimilaridade.h"
+#include "CSR.h"
 
 typedef struct {
     int produto;
@@ -11,5 +12,6 @@ typedef struct {
 
 bool ordenarPorNota(const Produto &a, const Produto &b);
 std::vector<Produto> recomendarProdutos(MatrizSimilaridade *matriz, Lista *dados,int cliente, int k);
+std::vector<Produto> recomendarProdutosCSR(matrizCSR *S, Lista *dados, int cliente, int k);
 
 #endif
