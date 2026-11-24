@@ -4,6 +4,7 @@
 #include "MatrizSimilaridade.h"
 #include <ctime>
 #include "recomendacao.h"
+#include "CSR.h"
 using namespace std;
 
 void teste1(Lista *dados) {
@@ -87,12 +88,12 @@ void teste3(Lista *dados) {
     }
     free(matriz.Similaridade);
 }
-int Primeiros(Lista *dados, Lista *sub, int k) {
-    for (int i = 0; i < k; i++) {
-        sub->clientes.push_back(dados->clientes[i]);
-        sub->comprasCliente.push_back(dados->comprasCliente[i]);
+int Primeiros(Lista *dados, Lista *listaReduzida, int numClientes) {
+    for (int i = 0; i < numClientes; i++) {
+        listaReduzida->clientes.push_back(dados->clientes[i]);
+        listaReduzida->comprasCliente.push_back(dados->comprasCliente[i]);
     }
-    sub->produtos = dados->produtos;
+    listaReduzida->produtos = dados->produtos;
     return 1;
 }
 void teste4(Lista *dados) {
@@ -106,18 +107,18 @@ void teste4(Lista *dados) {
             n = total;
         }
 
-        Lista sub;
-        Primeiros(dados, &sub, n);
+        Lista listaReduzida;
+        Primeiros(dados, &listaReduzida, n);
         MatrizSimilaridade matrizPadrao;
         MatrizSimilaridade matrizAdaptada;
 
         clock_t inicio = clock();
-        CalcularSimilaridade(&matrizPadrao, &sub, 0);
+        CalcularSimilaridade(&matrizPadrao, &listaReduzida, 0);
         clock_t fim = clock();
         double tempoPadrao = double(fim - inicio) / CLOCKS_PER_SEC;
 
         inicio = clock();
-        CalcularSimilaridade(&matrizAdaptada, &sub, 1);
+        CalcularSimilaridade(&matrizAdaptada, &listaReduzida, 1);
         fim = clock();
         double tempoAdaptado = double(fim - inicio) / CLOCKS_PER_SEC;
 
@@ -136,10 +137,50 @@ void teste4(Lista *dados) {
         }
     }
 }
+void teste5(Lista*dados){
+    int tamanhos[4] = {250, 500, 1000, 2000};
+    int total = dados ->clientes.size();
+
+       printf("\n%8s %11s %11s %15s %15s\n", "clientes", "padrao (s)", "CSR (s)", "padrao (bytes)", "CSR (bytes)");
+    for (int t = 0; t < 4; t++) {
+        int n = tamanhos[t];
+        if (n > total) {
+            n = total;
+        }
+        Lista listaReduzida;
+        Primeiros(dados, &listaReduzida, n);
+        MatrizSimilaridade matrizPadrao;
+        clock_t inicio = clock();
+        CalcularSimilaridade(&matrizPadrao, &listaReduzida, 0);
+        clock_t fim = clock();
+        double tempoPadrao = double(fim - inicio) / CLOCKS_PER_SEC;
+        matrizCSR A;
+        matrizCSR C;
+        matrizCSR S;
+        inicio = clock();
+        criaComprasCSR(&listaReduzida, &A);
+        criaInterseccaoCSR(&A, &C);
+        criaSimilaridadeCSR(&A, &C, &S);
+        fim = clock();
+        double tempoCSR = double(fim - inicio) / CLOCKS_PER_SEC;
+        double memoriaPadrao = (double)n * n * sizeof(double);
+                double memoriaCSR = S.values.size() * sizeof(double);
+        memoriaCSR += S.col_index.size() * sizeof(int);
+        memoriaCSR += S.row_ptr.size() * sizeof(int);
+
+               printf("%8d %11.4f %11.4f %15.0f %15.0f\n", n, tempoPadrao, tempoCSR, memoriaPadrao, memoriaCSR);
+        free(matrizPadrao.Similaridade);
+        if (n == total) {
+            break;
+        }
+
+}
+}
+
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
-        printf("Uso: %s <arquivo.csv> <número do testador (1-4)> \n", argv[0]);
+        printf("Uso: %s <arquivo.csv> <número do testador (1-5)> \n", argv[0]);
         return 1;
     }
 
@@ -151,12 +192,16 @@ int main(int argc, char *argv[]) {
     } else if (opcao == 2) {
         teste2(&dados);
 
-        } else if (opcao == 3) {
+    } else if (opcao == 3) {
         teste3(&dados);
     } else if (opcao == 4) {
         teste4(&dados);
-    } else {
-        printf("Erro: o número deve estar entre 1-4\n");
+    }else if (opcao == 5) {
+        teste5(&dados);
+    }
+     else {
+        printf("Erro: o número deve estar entre 1-5\n");
         return 1;
     }
+    return 0;
 }
