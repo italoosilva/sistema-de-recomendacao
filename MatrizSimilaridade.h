@@ -4,14 +4,10 @@
 
 #include <stdlib.h>
 #include "ListaCompras.h"
-#include "CSR.h"
-
 
 typedef struct {
     int numClientes;
     double *Similaridade;
-    matrizCSR S;
-    int algoritmo;
 } MatrizSimilaridade;
 
 int CalcularSimilaridade(MatrizSimilaridade *matriz, Lista *ListaCompras, int algoritimo);

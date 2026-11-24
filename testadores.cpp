@@ -26,9 +26,9 @@ void teste1(Lista *dados) {
     }
 }
 
-void teste2(Lista *dados, int algoritmo) {
+void teste2(Lista *dados) {
     MatrizSimilaridade matriz;
-    if (CalcularSimilaridade(&matriz, dados, algoritmo) == 0) {
+    if (CalcularSimilaridade(&matriz, dados, 0) == 0) {
         printf("Erro ao calcular a similaridade.\n");
         return;
     
@@ -144,35 +144,27 @@ void teste5(Lista*dados){
        printf("\n%8s %11s %11s %15s %15s\n", "clientes", "padrao (s)", "CSR (s)", "padrao (bytes)", "CSR (bytes)");
     for (int t = 0; t < 4; t++) {
         int n = tamanhos[t];
-
         if (n > total) {
             n = total;
         }
-
         Lista listaReduzida;
         Primeiros(dados, &listaReduzida, n);
         MatrizSimilaridade matrizPadrao;
-
         clock_t inicio = clock();
         CalcularSimilaridade(&matrizPadrao, &listaReduzida, 0);
         clock_t fim = clock();
-
         double tempoPadrao = double(fim - inicio) / CLOCKS_PER_SEC;
-
         matrizCSR A;
         matrizCSR C;
         matrizCSR S;
-
         inicio = clock();
         criaComprasCSR(&listaReduzida, &A);
         criaInterseccaoCSR(&A, &C);
         criaSimilaridadeCSR(&A, &C, &S);
         fim = clock();
-
         double tempoCSR = double(fim - inicio) / CLOCKS_PER_SEC;
         double memoriaPadrao = (double)n * n * sizeof(double);
                 double memoriaCSR = S.values.size() * sizeof(double);
-
         memoriaCSR += S.col_index.size() * sizeof(int);
         memoriaCSR += S.row_ptr.size() * sizeof(int);
 
@@ -187,20 +179,18 @@ void teste5(Lista*dados){
 
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        printf("Uso: %s <arquivo.csv> <número do testador (1-5)> <algoritmo (0, 1 ou 2)>\n", argv[0]);
+    if (argc != 3) {
+        printf("Uso: %s <arquivo.csv> <número do testador (1-5)> \n", argv[0]);
         return 1;
     }
 
     Lista dados;
     organizarDados(argv[1], &dados);
     int opcao = atoi(argv[2]);
-    int algoritmo = atoi(argv[3]);
-
-    if (opcao == 1) {
+        if (opcao == 1) {
         teste1(&dados);
     } else if (opcao == 2) {
-        teste2(&dados, algoritmo);
+        teste2(&dados);
 
     } else if (opcao == 3) {
         teste3(&dados);
